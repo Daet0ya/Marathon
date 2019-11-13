@@ -150,6 +150,7 @@
             // t
             // 
             this.t.Enabled = true;
+            this.t.Tick += new System.EventHandler(this.t_Tick);
             // 
             // begun_login
             // 
@@ -171,6 +172,7 @@
             this.MaximizeBox = false;
             this.Name = "begun_login";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Авторизация бегуна";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.begun_login_FormClosed);
             this.ResumeLayout(false);

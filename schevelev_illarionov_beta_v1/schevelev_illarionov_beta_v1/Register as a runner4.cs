@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -38,12 +39,66 @@ namespace schevelev_illarionov_beta_v1
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if ((tb_email.Text != null) && (tb_Pass.Text == tb_povtpass.Text) && (tb_Pass.Text != null) && (tb_name.Text != null) && (tb_lastname.Text != null))
+            if ((tb_email.Text != "Введите email") && (tb_Pass.Text == tb_povtpass.Text) && (tb_Pass.Text != "******") && (tb_name.Text != null) && (tb_lastname.Text != null))
             {
-                this.Hide();
-                Runner_menu mn_r = new Runner_menu();
-                mn_r.Show();
+
+                try
+                {
+
+                  
+
+                        // MessageBox.Show("Jib,rf <!");
+                        string connectionString = null;
+                        SqlCommand cmd;
+                        SqlConnection con;
+                        string rol = "R";
+                        connectionString = ("Data Source=127.0.0.1;Initial Catalog=g464_Shevelev__Illarionov;User ID=student;Password=student");
+                        con = new SqlConnection(connectionString);
+                        con.Open();
+
+
+                        string connectionString2 = null;
+                        SqlCommand cmd2;
+                        SqlConnection con2;
+                       
+                        connectionString2 = ("Data Source=127.0.0.1;Initial Catalog=g464_Shevelev__Illarionov;User ID=student;Password=student");
+                        con2 = new SqlConnection(connectionString);
+                        con2.Open();
+
+                        cmd2 = new SqlCommand("Insert INTO [User](Email, Password, FirstName, LastName, RoleId) values(@email,@passw,@FN,@LN,@roll)", con);
+
+                        cmd2.Parameters.AddWithValue("@email", tb_email.Text);
+                        cmd2.Parameters.AddWithValue("@passw", tb_Pass.Text);
+                        cmd2.Parameters.AddWithValue("@FN", tb_name.Text);
+                        cmd2.Parameters.AddWithValue("@LN", tb_lastname.Text);
+                        cmd2.Parameters.AddWithValue("@roll", rol);
+
+                        cmd2.ExecuteNonQuery();
+                    //
+
+                        cmd = new SqlCommand("Insert INTO Runner(Email, Gender, DateOfBirth,CountryCode,Runner_img) values(@email,@gender,@Date,@cou,@img)", con);
+
+                        cmd.Parameters.AddWithValue("@email", tb_email.Text);
+                        cmd.Parameters.AddWithValue("@gender", comboBox1.SelectedValue);
+                        cmd.Parameters.AddWithValue("@date", dtp_day.Value);
+                        cmd.Parameters.AddWithValue("@cou", comboBox2.SelectedValue);
+                        cmd.Parameters.AddWithValue("@img", tb_file.Text);
+
+
+                        cmd.ExecuteNonQuery();
+
+
+                        this.Hide();
+                        Runner_menu mn_r = new Runner_menu();
+                        mn_r.Show();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Ошибка данных!");
+                }
+                
             }
+                
             else
                 MessageBox.Show("Ошибка данных!");
         }
@@ -55,6 +110,25 @@ namespace schevelev_illarionov_beta_v1
             // TODO: This line of code loads data into the 'g464_Shevelev__IllarionovDataSet1.Gender' table. You can move, or remove it, as needed.
             this.genderTableAdapter.Fill(this.g464_Shevelev__IllarionovDataSet1.Gender);
 
+
+            int mou = Convert.ToInt32(DateTime.Now.Month);
+          int years = Convert.ToInt32(DateTime.Now.Year);
+          int days = Convert.ToInt32(DateTime.Now.Day);
+          years = years - 15;
+            DateTime date1 = new  DateTime(years,mou,days);
+            dtp_day.MaxDate=date1;
+
+            years = years - 100;
+            DateTime date2 = new DateTime(years, mou, days);
+            dtp_day.MinDate = date2;
+
+
+            tb_email.Text = "Введите email";
+            tb_email.ForeColor = Color.Gray;
+            tb_Pass.Text = "******";
+            tb_Pass.ForeColor = Color.Gray;
+            tb_povtpass.Text = "******";
+            tb_povtpass.ForeColor = Color.Gray;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -66,15 +140,83 @@ namespace schevelev_illarionov_beta_v1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            tb_file.ReadOnly=false;
             string filePath = "";
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Файлы изображений (*.bmp, *.jpg, *.png , *jpeg)|*.bmp;*.jpg;*.png;*.jpeg";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 filePath = ofd.FileName;
             }
+            else
+            {
+                tb_file.ReadOnly = false;
+                tb_file.Text = "";
+                pictureBox1.ImageLocation = "";
+                return;
+            }
 
             tb_file.Text = filePath;
             pictureBox1.ImageLocation = filePath;
+            tb_file.ReadOnly = true;
         }
+
+ 
+
+        private void tb_email_Enter(object sender, EventArgs e)
+        {
+            if (tb_email.Text == "Введите email")
+            {
+                tb_email.Clear();
+                tb_email.ForeColor = Color.Black;
+            }
+        }
+
+        private void tb_email_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tb_email.Text))
+            {
+                tb_email.Text = "Введите email";
+                tb_email.ForeColor = Color.Gray;
+            }
+        }
+
+        private void tb_Pass_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tb_Pass.Text))
+            {
+                tb_Pass.Text = "******";
+                tb_Pass.ForeColor = Color.Gray;
+            }
+        }
+
+        private void tb_Pass_Enter(object sender, EventArgs e)
+        {
+            if (tb_Pass.Text == "******")
+            {
+                tb_Pass.Clear();
+                tb_Pass.ForeColor = Color.Black;
+            }
+        }
+
+        private void tb_povtpass_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tb_povtpass.Text))
+            {
+                tb_povtpass.Text = "******";
+                tb_povtpass.ForeColor = Color.Gray;
+            }
+        }
+
+        private void tb_povtpass_Enter(object sender, EventArgs e)
+        {
+            if (tb_povtpass.Text == "******")
+            {
+                tb_povtpass.Clear();
+                tb_povtpass.ForeColor = Color.Black;
+            }
+        }
+
+       
     }
 }
